@@ -15,7 +15,7 @@ def greet(name):
 
 @app.route("/template")
 def template():
-    py_name  = "すなばこ"
+    py_name  = "ライフライン"
     return  render_template("index.html",name = py_name)
 
 
