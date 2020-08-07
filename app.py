@@ -1,5 +1,5 @@
 #Flaskからimportしてflaskを使えるようにする
-from flask import Flask,render_template
+from flask import Flask,render_template,sqlite3
  
 #appっていう名前でFlaskアプリをつくっていくよ～みみたいな
 app  = Flask(__name__)
@@ -28,6 +28,20 @@ def sarada():
 def weather():
     py_weather  = "晴れ"
     return  render_template("weather.html",weather = py_weather)
+
+
+@app.route("/dbtest")
+def dbtest():
+    conn = sqlite3.connect("flasktest.db")
+    c = conn.cursor()
+    #課題１ スタッフの誰か一名 （誰でも可）情報を取得するSQL
+    c.excute("SELECT * FROM staff")
+    staff_info = c.fetchone()
+    c.close()
+    print(staff_info)
+
+    #課題２ スタッフの誰か一名（誰でも可）情報を表示するHTMLを作成し表示
+    return render_template("")
 
 
 
