@@ -23,6 +23,14 @@ def sarada():
     return render_template("sarada.html")
 
 
+
+@app.route("/weather")
+def weather():
+    py_weather  = "晴れ"
+    return  render_template("weather.html",weather = py_weather)
+
+
+
 if __name__ == "__main__":
     #flaskが持っている開発者用サーバを実行します
     app.run(debug=True)
