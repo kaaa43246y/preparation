@@ -35,7 +35,7 @@ def dbtest():
     conn = sqlite3.connect("flasktest.db")
     c = conn.cursor()
     #課題１ スタッフの誰か一名 （誰でも可）情報を取得するSQL
-    c.excute("SELECT * FROM staff")
+    c.excute("SELECT * FROM staff where "カンパネルラ")
     staff_info = c.fetchone()
     c.close()
     print(staff_info)
