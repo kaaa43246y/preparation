@@ -18,7 +18,9 @@ def template():
     py_name  = "ライフライン"
     return  render_template("index.html",name = py_name)
 
-
+@app.route("/sarada")
+def sarada():
+    return render_template("sarada.html")
 
 
 if __name__ == "__main__":
