@@ -1,5 +1,5 @@
 #Flaskからimportしてflaskを使えるようにする
-from flask import Flask,render_template
+from flask import Flask,render_template,request,session,redirect
 import sqlite3
  
 #appっていう名前でFlaskアプリをつくっていくよ～みみたいな
@@ -64,6 +64,54 @@ def task_list():
     print(task_list)
 
     return render_template("tasklist.html",task_list=task_list)
+
+# 追加送信機能
+
+
+@app.route("/add",methods=["GET"])
+def add_get():
+    return render_template("add.html")
+
+
+
+@app.route("/add",methods=["POST"])
+def add_post():
+    name = request.form.get("task")
+    limit = request.form.get("limit")
+    conn = sqlite3.connect("tasklist.db")
+    c = conn.cursor()
+    c.execute('insert into task values(null,?,?)',(name,limit))
+    conn.commit()
+    conn.close
+    print(task_list)
+
+    return redirect("/task_list")
+
+# 編集機能追加
+@app.route("/edit/<int:id")
+def edit(id):
+    
+    conn = sqlite3.connect("tasklist.db")
+    c = conn.cursor()
+    c.execute('select name,limit from task where id = ?',(id,))
+    task = c.fetchone
+    conn.close
+    if task is not None:
+        task = task[0]
+        limit = task[1]
+    else:
+        return "タスクはありません"
+
+    item = {"id":id,"task":task, "limit":limit}
+
+    return render_template("/edit.html", task = item)
+
+
+
+
+# 削除機能追加
+
+
 
 
 
