@@ -46,6 +46,27 @@ def dbtest():
 
 
 
+
+# todolist
+
+@app.route("/task_list")
+def task_list():
+    conn = sqlite3.connect("tasklist.db")
+    c = conn.cursor()
+
+    c.execute('SELECT * from task')
+    task_list =[]
+
+
+    for row in c.fetchall():
+        task_list.append({"id":row[0], "task":row[1], "limit":row[2]})
+    c.close()
+    print(task_list)
+
+    return render_template("tasklist.html",task_list=task_list)
+
+
+
 if __name__ == "__main__":
     #flaskが持っている開発者用サーバを実行します
     app.run(debug=True)
