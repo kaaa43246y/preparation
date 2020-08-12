@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block content %}
+<!-- ここに中身をかいていく！ -->
+<form action="/login" method="POST"> <!--registをPOSTつうしんするよ-->
+    名前：<input class="" type="text" name="name">
+    パスワード：<input class="" type="password" name="password">
+    <input type="submit" name="save" value="ログイン">
+</form>
+
+
+
+<!-- ここまでが中身 -->
+{% endblock %}

@@ -5,6 +5,9 @@ import sqlite3
 #appっていう名前でFlaskアプリをつくっていくよ～みみたいな
 app  = Flask(__name__)
 
+# session利用時にはシークレットキーが必要
+app.secret_key = 'sunabacoyatsushiro'
+
 
 @app.route("/")
 def helloworld():
@@ -51,19 +54,22 @@ def dbtest():
 
 @app.route("/task_list")
 def task_list():
+    user_id = session["user_id"]
     conn = sqlite3.connect("tasklist.db")
     c = conn.cursor()
+    c.execute("select name from user where id = ?",(user_id,))
+    user_name = c.fetchone()[0]
 
-    c.execute('SELECT * from task')
+
+    
+    c.execute("select * from task where user_id = ?",(user_id,))
     task_list =[]
-
-
     for row in c.fetchall():
         task_list.append({"id":row[0], "task":row[1], "limit":row[2]})
     c.close()
     print(task_list)
 
-    return render_template("tasklist.html",task_list=task_list)
+    return render_template("tasklist.html",user_name =user_name,task_list=task_list)
 
 # 追加送信機能
 
@@ -76,11 +82,12 @@ def add_get():
 
 @app.route("/add",methods=["POST"])
 def add_post():
+    user_id = session["user_id"]
     name = request.form.get("task")
-    limit = request.form.get("task_limit")
+    limit = request.form.get("limit")
     conn = sqlite3.connect("tasklist.db")
     c = conn.cursor()
-    c.execute('insert into task values(null,?,?)',(name,limit))
+    c.execute('insert into task values(null,?,?,?)',(name,limit,user_id))
     conn.commit()
     conn.close
     print(task_list)
@@ -94,7 +101,7 @@ def edit(id):
     c = conn.cursor()
     c.execute('select * from task where id = ?',(id,))
     task_list = c.fetchone() #タスクからとってきてね
-    conn.close
+    conn.close  
     if task_list is not None:
         task = task_list[1]
         limit = task_list[2]
@@ -132,6 +139,49 @@ def delete_task(id):
     conn.commit() 
     conn.close
     return redirect("/task_list")
+
+# login
+@app.route("/regist",methods = ["GET"])
+def regist_get():
+    return render_template("regist.html")
+
+@app.route("/regist",methods=["POST"])
+def regist_post():
+    name = request.form.get("name")
+    password = request.form.get("password")
+    conn = sqlite3.connect("tasklist.db") #sqlに接続してください
+    c = conn.cursor() #.cursor
+    c.execute('insert into user values(null,?,?)',(name,password))
+    conn.commit()#commitは変更があるときに使用
+    conn.close
+
+    return redirect("/login") #どこ行かせたいか
+
+@app.route("/login",methods=["GET"])
+def login_get():
+    return render_template("login.html")
+
+@app.route("/login",methods=["POST"])
+def login_post():
+    name = request.form.get("name")
+    password = request.form.get("password")
+    conn = sqlite3.connect("tasklist.db") #sqlに接続してください
+    c = conn.cursor() #.cursor
+    c.execute("select id from user where name = ? and password = ?",(name,password))
+    user_id = c.fetchone()
+    conn.close
+
+    if user_id is None:
+        return render_template("login.html")
+    else:
+        session["user_id"] = user_id[0]#.session
+        return redirect("/task_list") #どこ行かせたいか
+
+@app.route("/logout")
+def logout():
+    session.pop("user_id",None)
+    return redirect("login")
+
 
 
 
