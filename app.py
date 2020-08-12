@@ -10,7 +10,7 @@ app  = Flask(__name__)
 def helloworld():
     return "Hello World."
 
-@app.route("/<name>")
+@app.route("/template/<name>")
 def greet(name):
     return name + "さん、ハロー！"
 
@@ -77,7 +77,7 @@ def add_get():
 @app.route("/add",methods=["POST"])
 def add_post():
     name = request.form.get("task")
-    limit = request.form.get("limit")
+    limit = request.form.get("task_limit")
     conn = sqlite3.connect("tasklist.db")
     c = conn.cursor()
     c.execute('insert into task values(null,?,?)',(name,limit))
@@ -88,29 +88,50 @@ def add_post():
     return redirect("/task_list")
 
 # 編集機能追加
-@app.route("/edit/<int:id")
+@app.route("/edit/<int:id>")
 def edit(id):
-    
-    conn = sqlite3.connect("tasklist.db")
+    conn = sqlite3.connect("tasklist.db")  #データベースに接続
     c = conn.cursor()
-    c.execute('select name,limit from task where id = ?',(id,))
-    task = c.fetchone
+    c.execute('select * from task where id = ?',(id,))
+    task_list = c.fetchone() #タスクからとってきてね
     conn.close
-    if task is not None:
-        task = task[0]
-        limit = task[1]
+    if task_list is not None:
+        task = task_list[1]
+        limit = task_list[2]
     else:
         return "タスクはありません"
 
-    item = {"id":id,"task":task, "limit":limit}
+    item = {"id":id,"task":task,"limit":limit}
 
     return render_template("/edit.html", task = item)
 
+@app.route("/edit",methods=["POST"])
+def update_task():
+    item_id = request.form.get("task_id")
+    task = request.form.get("task")
+    limit = request.form.get("limit")
+    conn = sqlite3.connect("tasklist.db")
+    c = conn.cursor()
+    # c.execute('update name limit set task = ?,limit = ? where id = ?,',(task,limit,item_id))
+    c.execute('update task set name = ? ,task_limit = ? where id = ?',(task,limit,item_id))
+    conn.commit()
+    conn.close()
 
+    return redirect("/task_list")
 
+@app.errorhandler(404)
+def notfound(code): 
+    return "ようこそ！404だよ！！！"
 
 # 削除機能追加
-
+@app.route("/delete/<int:id>")
+def delete_task(id):
+    conn = sqlite3.connect("tasklist.db")  #データベースに接続
+    c = conn.cursor()
+    c.execute('delete from task where id = ?',(id,))
+    conn.commit() 
+    conn.close
+    return redirect("/task_list")
 
 
 

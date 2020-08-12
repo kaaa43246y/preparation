@@ -8,12 +8,16 @@
         <td>{{item["id"]}}</td>
         <td>{{item["task"]}}</td>
         <td>{{item["limit"]}}</td>
+        <td><a href= "/edit/{{item['id']}}">編集</a></td>
+        <td><a href= "/delete/{{item['id']}}">削除</a></td>
+        
     </tr>
 
     {% endfor %}
 
-</table>
 
+</table>
+<a href="/add">追加</a>
 
 <!-- ここまでが中身 -->
 {% endblock %}
